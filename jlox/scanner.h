@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "tokens.h"
+#include <optional>
 
 #pragma once
 
@@ -39,8 +40,13 @@ private:
      * @return - the next character in source.
      */
     char peek() noexcept;
+    char peekNext() noexcept;
 
-    void addToken(TokenType) noexcept;
+    void string() noexcept;
+
+    void addToken(TokenType, Literal&& literal = std::monostate{}) noexcept;
+
+    void number() noexcept;
 
 
 private:
@@ -49,4 +55,5 @@ private:
     int current{0};
     int line{1};
     std::vector<Token> scanned_tokens;
+
 };

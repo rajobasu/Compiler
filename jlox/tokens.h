@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <variant>
 
 #pragma once
 
@@ -28,17 +29,31 @@ enum class TokenType {
     LOX_EOF
 };
 
-struct Token {
-    Token(TokenType _token_type, std::string&& _lexeme, int _line)
-            : token_type(_token_type), lexeme(std::move(_lexeme)), line_number(_line) {}
+using Literal = std::variant<std::monostate, int, double, std::string>;
 
-    Token(TokenType _token_type, std::string& _lexeme, int _line)
-            : token_type(_token_type), lexeme(std::move(_lexeme)), line_number(_line) {}
+template<typename T>
+concept LexemeType = std::convertible_to<T, std::string>;
+
+template<typename T>
+concept LiteralType = std::is_arithmetic_v<T> || std::convertible_to<T, std::string> ||
+                      std::convertible_to<T, std::monostate>;
+
+struct Token {
+    template<LexemeType L>
+    Token(TokenType _token_type, L &&_lexeme, int _line)
+            : token_type(_token_type), lexeme(std::forward<L>(_lexeme)), line_number(_line) {}
+
+    template<LexemeType L>
+    Token(TokenType _token_type, L &&_lexeme, Literal &&literal, int _line)
+            : token_type(_token_type), lexeme(std::forward<L>(_lexeme)), literal(std::forward<Literal>(literal)),
+              line_number(_line) {}
 
     const TokenType token_type;
     const std::string lexeme;
+    const Literal literal;
     const int line_number;
 };
 
-std::ostream& operator<<(std::ostream& out, const TokenType& token_type);
-std::ostream& operator<<(std::ostream& out, const Token& token);
+std::ostream &operator<<(std::ostream &out, const TokenType &token_type);
+
+std::ostream &operator<<(std::ostream &out, const Token &token);

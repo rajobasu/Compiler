@@ -2,9 +2,13 @@
 // Created by Rajarshi on 19/4/24.
 //
 #include <cassert>
+#include <optional>
 #include "scanner.h"
 #include "errors.h"
 
+static bool isDigit(char c) {
+    return c >= '0' && c <= '9';
+}
 
 void Scanner::scanToken() noexcept {
     char c = advance();
@@ -66,11 +70,20 @@ void Scanner::scanToken() noexcept {
             // Ignore whitespace.
             break;
 
+        case '"':
+            string();
+            break;
+
         case '\n':
             line++;
             break;
 
         default:
+            if (isDigit(c)) {
+                number();
+            } else {
+                error(line, "Unexpected character.");
+            }
             error(line, "Unexpected token.");
     }
 }
@@ -90,9 +103,9 @@ char Scanner::advance() noexcept {
     return source[current++];
 }
 
-void Scanner::addToken(TokenType token_type) noexcept {
+void Scanner::addToken(TokenType token_type, Literal&& literal) noexcept {
     std::string lexeme = source.substr(start, current - start);
-    scanned_tokens.emplace_back(token_type, lexeme, line);
+    scanned_tokens.emplace_back(token_type, lexeme, std::forward<Literal>(literal), line);
 }
 
 bool Scanner::match(char expected) noexcept {
@@ -108,3 +121,45 @@ char Scanner::peek() noexcept {
 
     return source[current];
 }
+
+char Scanner::peekNext() noexcept {
+    if (current + 1 >= source.size()) return '\0';
+    return source[current + 1];
+}
+
+void Scanner::string() noexcept {
+    while (peek() != '"' && !isAtEnd()) {
+        if (peek() == '\n') line++;
+        advance();
+    }
+
+    if (isAtEnd()) {
+        error(line, "Unterminated string.");
+        return;
+    }
+
+    // The closing ".
+    advance();
+
+    // Trim the surrounding quotes.
+    addToken(
+    TokenType::STRING,
+    source.substr(start + 1, current - start - 1)
+    );
+}
+
+void Scanner::number() noexcept {
+    while (isDigit(peek())) advance();
+
+    // Look for a fractional part.
+    if (peek() == '.' && isDigit(peekNext())) {
+        // Consume the "."
+        advance();
+
+        while (isDigit(peek())) advance();
+    }
+
+    addToken(TokenType::NUMBER,
+             std::move(stod(source.substr(start, current - start + 1))));
+}
+

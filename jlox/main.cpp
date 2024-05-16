@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sysexits.h>
 #include <fstream>
+#include <filesystem>
 #include "scanner.h"
 #include "errors.h"
 
