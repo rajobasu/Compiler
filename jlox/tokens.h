@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <unordered_map>
 #include <variant>
 
 #pragma once
@@ -29,14 +30,30 @@ enum class TokenType {
     LOX_EOF
 };
 
+const std::unordered_map<std::string, TokenType> KEYWORD_LIST = {
+    {"and",    TokenType::AND},
+    {"class",  TokenType::CLASS},
+    {"else",   TokenType::ELSE},
+    {"false",  TokenType::FALSE},
+    {"for",    TokenType::FOR},
+    {"fun",    TokenType::FUN},
+    {"if",     TokenType::IF},
+    {"nil",    TokenType::NIL},
+    {"or",     TokenType::OR},
+    {"print",  TokenType::PRINT},
+    {"return", TokenType::RETURN},
+    {"super",  TokenType::SUPER},
+    {"this",   TokenType::THIS},
+    {"true",   TokenType::TRUE},
+    {"var",    TokenType::VAR},
+    {"while",  TokenType::WHILE}
+};
+
+
 using Literal = std::variant<std::monostate, int, double, std::string>;
 
 template<typename T>
 concept LexemeType = std::convertible_to<T, std::string>;
-
-template<typename T>
-concept LiteralType = std::is_arithmetic_v<T> || std::convertible_to<T, std::string> ||
-                      std::convertible_to<T, std::monostate>;
 
 struct Token {
     template<LexemeType L>

@@ -63,7 +63,7 @@ void Scanner::scanToken() noexcept {
                 addToken(TokenType::SLASH);
             }
             break;
-            
+
         case ' ':
         case '\r':
         case '\t':
@@ -81,15 +81,23 @@ void Scanner::scanToken() noexcept {
         default:
             if (isDigit(c)) {
                 number();
+            } else if (isAlpha(c)) {
+                identifier();
             } else {
                 error(line, "Unexpected character.");
             }
-            error(line, "Unexpected token.");
     }
 }
 
 std::vector<Token> Scanner::scanTokens() noexcept {
-    return {};
+    while (!isAtEnd()) {
+        // We are at the beginning of the next lexeme.
+        start = current;
+        scanToken();
+    }
+
+    addToken(TokenType::LOX_EOF);
+    return scanned_tokens;
 }
 
 
@@ -103,7 +111,7 @@ char Scanner::advance() noexcept {
     return source[current++];
 }
 
-void Scanner::addToken(TokenType token_type, Literal&& literal) noexcept {
+void Scanner::addToken(TokenType token_type, Literal &&literal) noexcept {
     std::string lexeme = source.substr(start, current - start);
     scanned_tokens.emplace_back(token_type, lexeme, std::forward<Literal>(literal), line);
 }
@@ -143,8 +151,8 @@ void Scanner::string() noexcept {
 
     // Trim the surrounding quotes.
     addToken(
-    TokenType::STRING,
-    source.substr(start + 1, current - start - 1)
+            TokenType::STRING,
+            source.substr(start + 1, current - start - 1)
     );
 }
 
@@ -160,6 +168,25 @@ void Scanner::number() noexcept {
     }
 
     addToken(TokenType::NUMBER,
-             std::move(stod(source.substr(start, current - start + 1))));
+             stod(source.substr(start, current - start + 1)));
+}
+
+bool Scanner::isAlpha(char c) noexcept {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+           c == '_';
+}
+
+void Scanner::identifier() noexcept {
+    while (isAlpha(peek()) || isDigit(peek())) advance();
+
+    std::string text = source.substr(start, current - start);
+    auto it = KEYWORD_LIST.find(text);
+    if (it != KEYWORD_LIST.end()) {
+        addToken(it->second);
+        return;
+    }
+
+    addToken(TokenType::IDENTIFIER, std::move(text));
 }
 

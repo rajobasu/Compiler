@@ -40,14 +40,18 @@ private:
      * @return - the next character in source.
      */
     char peek() noexcept;
+
     char peekNext() noexcept;
 
     void string() noexcept;
 
-    void addToken(TokenType, Literal&& literal = std::monostate{}) noexcept;
+    void addToken(TokenType, Literal &&literal = std::monostate{}) noexcept;
 
     void number() noexcept;
 
+    static bool isAlpha(char c) noexcept;
+
+    void identifier() noexcept;
 
 private:
     std::string source;
@@ -55,5 +59,4 @@ private:
     int current{0};
     int line{1};
     std::vector<Token> scanned_tokens;
-
 };

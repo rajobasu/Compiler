@@ -50,6 +50,18 @@ std::ostream& operator<<(std::ostream& out, const TokenType& token_type) {
     }
 }
 
-std::ostream& operator<<(std::ostream& out, const Token& token) {
-    return out << token.token_type << "|" << token.lexeme << "|" << token.line_number;
+std::ostream& operator<<(std::ostream& out, const std::monostate& monostate) {
+    return out << "null";
 }
+
+std::ostream& operator<<(std::ostream& out, const Literal& literal) {
+    std::visit([&out](const auto& value) {
+        out << value;
+    }, literal);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Token& token) {
+    return out << token.token_type << "|" << token.lexeme << "|" << token.literal << "|" << token.line_number;
+}
+
