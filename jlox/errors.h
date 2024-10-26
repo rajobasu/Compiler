@@ -1,13 +1,19 @@
 //
 // Created by Rajarshi on 19/4/24.
 //
-#include <string>
+#include "Base.h"
+#include "tokens.h"
 
 #pragma once
 
 using namespace std;
 
-extern bool hadError;
+namespace error_handling {
+    class parse_exception : std::exception {};
 
-void error(int line, const string& message);
-static void report(int line, const string& where,const string& message);
+    extern bool hadError;
+
+    void error(int line, const string &message);
+    void error(const Token&, const string&);
+    static void report(int line, const string &where, const string &message);
+}

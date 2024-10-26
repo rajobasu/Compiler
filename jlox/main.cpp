@@ -4,6 +4,7 @@
 #include <filesystem>
 #include "scanner.h"
 #include "errors.h"
+#include "Parser.h"
 
 using namespace std;
 
@@ -11,9 +12,12 @@ void run(const string& content) {
     Scanner scanner(content);
     auto tokens = scanner.scanTokens();
 
-    for (const Token& token: tokens) {
-        cout << token << endl;
-    }
+    Parser parser(tokens);
+    auto expression = parser.parse();
+
+    if (error_handling::hadError) return;
+
+    cout << *expression << endl;
 }
 
 
@@ -37,7 +41,7 @@ void runFile(const filesystem::path& file_path) {
     // now run the file using the data
     run(file_contents);
 
-    if (hadError) {
+    if (error_handling::hadError) {
         exit(EX_DATAERR);
     }
 }

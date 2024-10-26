@@ -1,7 +1,7 @@
 //
 // Created by Rajarshi on 19/4/24.
 //
-#include <string>
+#include "Base.h"
 #include <iostream>
 #include <utility>
 #include <unordered_map>
@@ -50,7 +50,7 @@ const std::unordered_map<std::string, TokenType> KEYWORD_LIST = {
 };
 
 
-using Literal = std::variant<std::monostate, int, double, std::string>;
+using Literal = std::variant<std::monostate, bool, nullptr_t, int, double, std::string>;
 
 template<typename T>
 concept LexemeType = std::convertible_to<T, std::string>;
@@ -71,6 +71,7 @@ struct Token {
     const int line_number;
 };
 
-std::ostream &operator<<(std::ostream &out, const TokenType &token_type);
-
-std::ostream &operator<<(std::ostream &out, const Token &token);
+std::ostream& operator<<(std::ostream& out, const std::monostate&);
+std::ostream& operator<<(std::ostream &out, const TokenType&);
+std::ostream& operator<<(std::ostream& out, const Literal&);
+std::ostream& operator<<(std::ostream &out, const Token&);

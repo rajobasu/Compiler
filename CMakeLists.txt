@@ -8,4 +8,10 @@ add_executable(jlox jlox/main.cpp
         jlox/tokens.cpp
         jlox/tokens.h
         jlox/scanner.cpp
-        jlox/scanner.h)
+        jlox/scanner.h
+        jlox/Expression.cpp
+        jlox/Expression.h
+        jlox/Parser.cpp
+        jlox/Parser.h
+        jlox/Base.h
+)
