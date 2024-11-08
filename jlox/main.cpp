@@ -5,6 +5,7 @@
 #include "scanner.h"
 #include "errors.h"
 #include "Parser.h"
+#include "ExpressionVisitors.h"
 
 using namespace std;
 
@@ -14,10 +15,10 @@ void run(const string& content) {
 
     Parser parser(tokens);
     auto expression = parser.parse();
-
+    cout << "had error" << endl;
     if (error_handling::hadError) return;
-
-    cout << *expression << endl;
+    cout << "here" << endl;
+    expression->acceptVisitor(ExpressionPrinter(cout));cout << endl;
 }
 
 
@@ -56,7 +57,7 @@ int main(int argc, char** argv) {
         cout << "Usage: jlox [script.lox]" << endl;
         return EX_USAGE;
     } else if (argc == 2) {
-        runFile(argv[1]);
+        //runFile(argv[1]);
     } else {
         runPrompt();
     }

@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 
 using namespace std;

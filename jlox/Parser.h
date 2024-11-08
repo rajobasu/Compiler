@@ -78,6 +78,7 @@ private:
                 case TokenType::PRINT:
                 case TokenType::VAR:
                     return;
+                default:
             }
         }
 
