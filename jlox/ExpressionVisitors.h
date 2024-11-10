@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Base.h"
+#include "errors.h"
 #include "Expression.h"
 
 struct ExpressionPrinter {
@@ -25,7 +26,11 @@ public:
     Literal operator()(const LiteralExpression &expr) const;
 public:
     void interpret(const Expression& expr) {
-        Literal value = std::visit(*this, expr);
-        cout << value << endl;
+        try {
+            Literal value = std::visit(*this, expr);
+            cout << value << endl;
+        } catch (error_handling::runtime_exception &e) {
+            error_handling::runtime_error(e.token, e.reason);
+        }
     }
 };

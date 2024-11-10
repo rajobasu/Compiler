@@ -7,10 +7,8 @@
 #include "errors.h"
 
 namespace error_handling {
-
-
-
     bool hadError = false;
+    bool hadRuntimeError = false;
 
     void error(int line, const string &message) {
         report(line, "", message);
@@ -22,6 +20,10 @@ namespace error_handling {
         } else {
             report(token.line_number, " at '" + token.lexeme + "'", message);
         }
+    }
+
+    void runtime_error(const Token& token, const string& message) {
+        cout << message << "\n" << "    --> [Line " << token.line_number << "]" << endl;
     }
 
     static void report(int line, const string &where, const string &message) {

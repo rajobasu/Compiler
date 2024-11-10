@@ -14,10 +14,8 @@ namespace error_handling {
     class parse_exception : std::exception {
     };
 
-    class runtime_exception : std::exception {
-    public:
+    struct runtime_exception : std::exception {
         runtime_exception(Token _token, string _reason) : token(std::move(_token)), reason(std::move(_reason)) {}
-    public:
         const Token token;
         const string reason;
     };

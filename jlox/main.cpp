@@ -12,19 +12,10 @@ using namespace std;
 void run(const string& content) {
     Scanner scanner(content);
     auto tokens = scanner.scanTokens();
-//    for (const auto& e : tokens) {
-//        cout << e << endl;
-//    }
-
 
     Parser parser(tokens);
     auto expression = parser.parse();
     if (error_handling::hadError) return;
-//    ExpressionPrinter printer(cout);
-//    std::visit(printer, *expression);
-//    cout << endl;
-    Literal l = std::monostate{};
-    cout << l << endl;
 
     ExpressionEvaluator evaluator;
     evaluator.interpret(*expression);
@@ -50,9 +41,12 @@ void runFile(const filesystem::path& file_path) {
 
     // now run the file using the data
     run(file_contents);
-
+    cout << file_contents << endl;
     if (error_handling::hadError) {
         exit(EX_DATAERR);
+    }
+    if (error_handling::hadRuntimeError) {
+        exit(EX_SOFTWARE);
     }
 }
 
