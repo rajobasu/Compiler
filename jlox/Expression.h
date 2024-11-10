@@ -4,22 +4,24 @@
 #include <memory>
 #include <utility>
 #include "tokens.h"
-#include "VisitorBase.h"
+#include "Utils.h"
 
 
+class BinaryExpression;
+class UnaryExpression;
+class GroupingExpression;
+class LiteralExpression;
 
+using Expression = std::variant<UnaryExpression, BinaryExpression, GroupingExpression, LiteralExpression>;
 
-
-struct Expression : public VisitableBase{
-    virtual void acceptVisitor(const VisitorBase&) const = 0;
-    virtual ~Expression() = default;
-};
-
-
+template <typename ExpressionSubTypeT, typename... Args>
+inline std::unique_ptr<Expression> make_expression(Args&&... args) {
+    return make_variant_upointer<Expression, ExpressionSubTypeT>(std::forward<Args>(args)...);
+}
 // -------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------
 
-class BinaryExpression : public Expression {
+class BinaryExpression {
 public:
     BinaryExpression(
             std::unique_ptr<Expression> left_,
@@ -28,10 +30,6 @@ public:
     ) : left(std::move(left_)),
         right(std::move(right_)),
         _operator(std::move(_operator_)) {};
-public:
-    void acceptVisitor(const VisitorBase &visitor) const override {
-        visitor.visit(*this);
-    }
 public:
     std::unique_ptr<Expression> left;
     Token _operator;
@@ -42,15 +40,11 @@ public:
 // -------------------------------------------------------------------------------------------------------------------
 
 
-class GroupingExpression : public Expression {
+class GroupingExpression {
 public:
     explicit GroupingExpression(
             std::unique_ptr<Expression> expression_
     ) : expression(std::move(expression_)) {}
-public:
-    void acceptVisitor(const VisitorBase &visitor) const override {
-        visitor.visit(*this);
-    }
 public:
     std::unique_ptr<Expression> expression;
 };
@@ -59,14 +53,10 @@ public:
 // -------------------------------------------------------------------------------------------------------------------
 
 
-class UnaryExpression : public Expression {
+class UnaryExpression {
 public:
     UnaryExpression(Token operator_, std::unique_ptr<Expression> expression_) : _operator(std::move(operator_)),
                                                                                 expression(std::move(expression_)) {}
-public:
-    void acceptVisitor(const VisitorBase &visitor) const override {
-        visitor.visit(*this);
-    }
 public:
     Token _operator;
     std::unique_ptr<Expression> expression;
@@ -76,13 +66,12 @@ public:
 // -------------------------------------------------------------------------------------------------------------------
 
 
-class LiteralExpression : public Expression {
+class LiteralExpression {
 public:
     explicit LiteralExpression(Literal value_) : value(std::move(value_)) {}
 public:
-    void acceptVisitor(const VisitorBase &visitor) const override {
-        visitor.visit(*this);
-    }
-public:
     Literal value;
 };
+
+
+

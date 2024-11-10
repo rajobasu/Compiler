@@ -50,7 +50,40 @@ const std::unordered_map<std::string, TokenType> KEYWORD_LIST = {
 };
 
 
-using Literal = std::variant<std::monostate, bool, nullptr_t, int, double, std::string>;
+using Literal = std::variant<std::monostate, bool, nullptr_t, double, std::string>;
+
+template <typename T>
+constexpr std::string get_literal_type_as_string();
+
+template <>
+constexpr std::string get_literal_type_as_string<double>() {
+    return "double";
+}
+
+template <>
+constexpr std::string get_literal_type_as_string<std::string>() {
+    return "string";
+}
+
+template <>
+constexpr std::string get_literal_type_as_string<nullptr_t>() {
+    return "nil";
+}
+
+template <>
+constexpr std::string get_literal_type_as_string<bool>() {
+    return "bool";
+}
+
+template <>
+constexpr std::string get_literal_type_as_string<std::monostate>() {
+    return "[Empty Literal]";
+}
+
+
+
+
+
 
 template<typename T>
 concept LexemeType = std::convertible_to<T, std::string>;

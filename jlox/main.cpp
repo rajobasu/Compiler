@@ -12,13 +12,22 @@ using namespace std;
 void run(const string& content) {
     Scanner scanner(content);
     auto tokens = scanner.scanTokens();
+//    for (const auto& e : tokens) {
+//        cout << e << endl;
+//    }
+
 
     Parser parser(tokens);
     auto expression = parser.parse();
-    cout << "had error" << endl;
     if (error_handling::hadError) return;
-    cout << "here" << endl;
-    expression->acceptVisitor(ExpressionPrinter(cout));cout << endl;
+//    ExpressionPrinter printer(cout);
+//    std::visit(printer, *expression);
+//    cout << endl;
+    Literal l = std::monostate{};
+    cout << l << endl;
+
+    ExpressionEvaluator evaluator;
+    evaluator.interpret(*expression);
 }
 
 
@@ -53,11 +62,12 @@ void runPrompt() {
 
 
 int main(int argc, char** argv) {
+
     if (argc > 2) {
         cout << "Usage: jlox [script.lox]" << endl;
         return EX_USAGE;
     } else if (argc == 2) {
-        //runFile(argv[1]);
+        runFile(argv[1]);
     } else {
         runPrompt();
     }

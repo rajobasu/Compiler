@@ -62,28 +62,7 @@ private:
         return true;
     }
 
-    void synchronise() {
-        advance();
-
-        while(!isAtEnd()) {
-            if (previous().token_type == TokenType::LOX_EOF) return;
-
-            switch (peek().token_type) {
-                case TokenType::CLASS:
-                case TokenType::FUN:
-                case TokenType::FOR:
-                case TokenType::WHILE:
-                case TokenType::IF:
-                case TokenType::RETURN:
-                case TokenType::PRINT:
-                case TokenType::VAR:
-                    return;
-                default:
-            }
-        }
-
-        advance();
-    }
+    void synchronise();
 
     error_handling::parse_exception error(const Token& token, const string& message) {
         error_handling::error(token, message);
@@ -92,8 +71,7 @@ private:
 
     void consumeOrThrow(TokenType type, const string& message) {
         if (checkCurrentTokenType(type)) advance();
-
-        throw error(peek(), message);
+        else throw error(peek(), message);
     }
 
     template <typename... TokenTypeT>

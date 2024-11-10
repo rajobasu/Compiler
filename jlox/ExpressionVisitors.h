@@ -5,29 +5,27 @@
 #pragma once
 
 #include "Base.h"
-#include "VisitorBase.h"
 #include "Expression.h"
 
-class ExpressionVisitor : public VisitorBase {
-public:
-    virtual void visit(const BinaryExpression&) const = 0;
-    virtual void visit(const GroupingExpression&) const = 0;
-    virtual void visit(const UnaryExpression&) const = 0;
-    virtual void visit(const LiteralExpression&) const = 0;
+struct ExpressionPrinter {
+    ostream& ostream_ref;
+    explicit ExpressionPrinter(ostream& _ostream_ref) : ostream_ref(_ostream_ref) {}
+
+    void operator()(const BinaryExpression &expr) const;
+    void operator()(const UnaryExpression &expr) const;
+    void operator()(const GroupingExpression &expr) const;
+    void operator()(const LiteralExpression &expr) const;
 };
 
-class ExpressionPrinter : public ExpressionVisitor {
-private:
-    ostream& ostream_ref;
+class ExpressionEvaluator {
 public:
-    ExpressionPrinter(ostream& _ostream_ref) : ostream_ref(_ostream_ref) {}
+    Literal operator()(const BinaryExpression &expr) const;
+    Literal operator()(const UnaryExpression &expr) const;
+    Literal operator()(const GroupingExpression &expr) const;
+    Literal operator()(const LiteralExpression &expr) const;
 public:
-    void visit(const BinaryExpression&) const override;
-    void visit(const GroupingExpression&) const override;
-    void visit(const UnaryExpression&) const override;
-    void visit(const LiteralExpression&) const override;
-
-    ~ExpressionPrinter() {
-        ostream_ref << endl;
+    void interpret(const Expression& expr) {
+        Literal value = std::visit(*this, expr);
+        cout << value << endl;
     }
 };

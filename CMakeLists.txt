@@ -13,7 +13,8 @@ add_executable(jlox jlox/main.cpp
         jlox/Parser.cpp
         jlox/Parser.h
         jlox/Base.h
-        jlox/VisitorBase.h
         jlox/ExpressionVisitors.h
         jlox/ExpressionVisitors.cpp
+        jlox/Utils.h
+        jlox/Operators.h
 )

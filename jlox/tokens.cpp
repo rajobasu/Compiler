@@ -3,6 +3,7 @@
 //
 
 #include "tokens.h"
+#include "Utils.h"
 
 
 std::ostream &operator<<(std::ostream &out, const TokenType &token_type) {
@@ -91,13 +92,18 @@ std::ostream &operator<<(std::ostream &out, const TokenType &token_type) {
 }
 
 std::ostream &operator<<(std::ostream &out, const std::monostate &monostate) {
-    return out << "null";
+    return out << "[Empty Literal]";
+}
+
+std::ostream &operator<<(std::ostream &out, const bool &value) {
+    return out << (value ? "true" : "false");
 }
 
 std::ostream &operator<<(std::ostream &out, const Literal &literal) {
-    std::visit([&out](const auto &value) {
-        out << value;
-    }, literal);
+    std::visit(overload {
+        [&] (const bool& value) -> std::ostream& { return out << (value ? "true": "false"); },
+        [&] (const auto& other_value) -> std::ostream& { return out << other_value; }
+        }, literal);
     return out;
 }
 
