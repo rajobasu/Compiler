@@ -12,25 +12,34 @@
 
 class Parser {
 public:
-    Parser(vector<Token> tokens_): tokens(std::move(tokens_)) {}
+    Parser(vector<Token> tokens_) : tokens(std::move(tokens_)) {}
+
 public:
     unique_ptr<Expression> parse() {
         try {
             return expression();
-        } catch (const error_handling::parse_exception& e) {
+        } catch (const error_handling::parse_exception &e) {
             return nullptr;
         }
     }
+
 private:
     std::unique_ptr<Expression> expression();
+
     std::unique_ptr<Expression> equality();
+
     std::unique_ptr<Expression> comparison();
+
     std::unique_ptr<Expression> term();
+
     std::unique_ptr<Expression> factor();
+
     std::unique_ptr<Expression> unary();
+
     std::unique_ptr<Expression> primary();
+
 private:
-    [[nodiscard]] const Token& peek() const {
+    [[nodiscard]] const Token &peek() const {
         return tokens[current];
     }
 
@@ -43,11 +52,11 @@ private:
         return peek().token_type == tokenType;
     }
 
-    [[nodiscard]] const Token& previous() const {
+    [[nodiscard]] const Token &previous() const {
         return tokens[current - 1];
     }
 
-    const Token& advanceAndReturn() {
+    const Token &advanceAndReturn() {
         if (!isAtEnd())current++;
         return previous();
     }
@@ -64,20 +73,23 @@ private:
 
     void synchronise();
 
-    error_handling::parse_exception error(const Token& token, const string& message) {
+    error_handling::parse_exception error(const Token &token, const string &message) {
         error_handling::error(token, message);
         throw error_handling::parse_exception();
     }
 
-    void consumeOrThrow(TokenType type, const string& message) {
+    void consumeOrThrow(TokenType type, const string &message) {
         if (checkCurrentTokenType(type)) advance();
         else throw error(peek(), message);
     }
 
-    template <typename... TokenTypeT>
-    bool match(TokenTypeT&&... tokenTypes) {
-        return ((checkCurrentTokenType(std::forward<decltype(tokenTypes)>(tokenTypes)) && (advance(), true)) || ...);
+    template<typename... TokenTypeT>
+    bool match(TokenTypeT &&... tokenTypes) {
+        bool success = (checkCurrentTokenType(std::forward<decltype(tokenTypes)>(tokenTypes)) || ...);
+        if (success) advance();
+        return success;
     }
+
 private:
     uint32_t current = 0;
     std::vector<Token> tokens;
