@@ -9,21 +9,24 @@
 #include "tokens.h"
 #include "Expression.h"
 #include "errors.h"
+#include "Statement.h"
 
 class Parser {
 public:
     Parser(vector<Token> tokens_) : tokens(std::move(tokens_)) {}
 
 public:
-    unique_ptr<Expression> parse() {
-        try {
-            return expression();
-        } catch (const error_handling::parse_exception &e) {
-            return nullptr;
-        }
+    std::vector<Statement> parse() {
+        std::vector<Statement> statements;
+        while(!isAtEnd()) statements.push_back(statement());
+        return statements;
     }
 
 private:
+    Statement statement();
+    Statement print_statement();
+    Statement expression_statement();
+
     std::unique_ptr<Expression> expression();
 
     std::unique_ptr<Expression> equality();
@@ -78,7 +81,7 @@ private:
         throw error_handling::parse_exception();
     }
 
-    void consumeOrThrow(TokenType type, const string &message) {
+    void consume_or_throw(TokenType type, const string &message) {
         if (checkCurrentTokenType(type)) advance();
         else throw error(peek(), message);
     }

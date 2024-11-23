@@ -18,4 +18,6 @@ add_executable(jlox jlox/main.cpp
         jlox/Utils.h
         jlox/Operators.h
         jlox/Expression.cpp
+        jlox/Statement.h
+        jlox/Statement.cpp
 )

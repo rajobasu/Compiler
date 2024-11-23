@@ -5,6 +5,23 @@
 #include "Parser.h"
 #include "Utils.h"
 
+Statement Parser::statement() {
+    if (match(TokenType::PRINT)) return print_statement();
+    return expression_statement();
+}
+
+Statement Parser::print_statement() {
+    auto expr = expression();
+    consume_or_throw(TokenType::SEMICOLON, "Expect ';' after value.");
+    return PrintStatement(std::move(*expr));
+}
+
+Statement Parser::expression_statement() {
+    auto expr = expression();
+    consume_or_throw(TokenType::SEMICOLON, "Expect ';' after value.");
+    return ExpressionStatement(std::move(*expr));
+}
+
 std::unique_ptr<Expression> Parser::Parser::expression() {
     return equality();
 }
@@ -18,7 +35,7 @@ std::unique_ptr<Expression> Parser::primary() {
 
     if (match(TokenType::LEFT_PAREN)) {
         auto expr = expression();
-        consumeOrThrow(TokenType::RIGHT_PAREN, "Missing corresponding ).");
+        consume_or_throw(TokenType::RIGHT_PAREN, "Missing corresponding ).");
         return make_expression<GroupingExpression>(std::move(expr));
     }
 

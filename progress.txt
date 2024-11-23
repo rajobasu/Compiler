@@ -1,1 +1,1 @@
-https://craftinginterpreters.com/parsing-expressions.html#syntax-errors
+https://craftinginterpreters.com/statements-and-state.html#executing-statements
